@@ -39,6 +39,7 @@ final class TaskCell: UITableViewCell, ReuseIdentifying {
     
     // MARK: - Private methods
     private func setupViews() {
+        backgroundColor = .clear
         contentView.layer.cornerRadius = Constants.cornerRadius
         [titleLabel, descriptionLabel, dateLabel].forEach {
             innerContentStack.addArrangedSubview($0)
@@ -62,7 +63,7 @@ final class TaskCell: UITableViewCell, ReuseIdentifying {
     }
     
     // MARK: - Public methods
-    public func update(with viewModel: TaskModel) {
+    public func update(with viewModel: TaskEntity) {
         titleLabel.text = viewModel.title
         descriptionLabel.text = viewModel.description
         dateLabel.text = viewModel.date.formatted()

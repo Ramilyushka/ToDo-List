@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct TaskModel {
+struct TaskEntity {
     var title: String
     var description: String
     var date: Date

@@ -7,8 +7,8 @@
 
 import Foundation
 
-struct MockTaskArray {
-    static let tasks: [TaskModel] = [
+struct MockTaskList {
+    static let tasks: [TaskEntity] = [
         .init(
             title: "Почитать книгу",
             description: "Составить список необходимых продуктов для ужина. Не забыть проверить, что уже есть в холодильнике.",

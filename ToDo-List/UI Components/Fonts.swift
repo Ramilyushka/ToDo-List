@@ -8,11 +8,14 @@
 import UIKit
 
 public enum Font {
+    case header
     case button
     case caption
     
     var font: UIFont {
         switch self {
+        case .header:
+            UIFont.systemFont(ofSize: 34, weight: .bold)
         case .button:
             UIFont.systemFont(ofSize: 16, weight: .medium)
         case .caption:
