@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum MockTaskArray {
+struct MockTaskArray {
     static let tasks: [TaskModel] = [
         .init(
             title: "Почитать книгу",
