@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TaskCell: UITableViewCell, ReuseIdentifying {
+final class TodoCell: UITableViewCell, ReuseIdentifying {
     
     static let identifier: String = "TaskCell"
     
@@ -63,15 +63,16 @@ final class TaskCell: UITableViewCell, ReuseIdentifying {
     }
     
     // MARK: - Public methods
-    public func update(with viewModel: TaskEntity) {
-        titleLabel.text = viewModel.title
-        descriptionLabel.text = viewModel.description
-        dateLabel.text = viewModel.date.formatted()
+    public func update(with todo: TodoEntity) {
+        titleLabel.text = todo.title
+        descriptionLabel.text = todo.description
+        dateLabel.text = todo.date.shortFormat
+        checkBox.isSelected = todo.completed
     }
 }
 
 // MARK: - Extension: Constants
-private extension TaskCell {
+private extension TodoCell {
     enum Constants {
         static let cornerRadius: CGFloat = 8
         static let spacing: CGFloat = 6

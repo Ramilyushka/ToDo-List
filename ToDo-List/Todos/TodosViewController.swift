@@ -6,16 +6,16 @@
 //
 import UIKit
 
-protocol TaskListViewProtocol: AnyObject {
-    func showTaskList()
-    func addTask()
-    func editTask(_ task: TaskEntity)
-    func deleteTask(_ task: TaskEntity)
+protocol TodosViewProtocol: AnyObject {
+    func update()
+    func add()
+    func edit(_ task: TodoEntity)
+    func delete(_ task: TodoEntity)
 }
 
-final class TaskListViewController: UIViewController {
+final class TodosViewController: UIViewController {
     // MARK: - Properties
-    private let tasks: [TaskEntity] = MockTaskList.tasks
+    private let presenter: TodosPresenterProtocol
     
     // MARK: - UI properties
     private let headerLabel = UILabel(font: .header)
@@ -27,10 +27,10 @@ final class TaskListViewController: UIViewController {
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         return searchBar
     }()
-    private var tasksTableView: UITableView = {
+    private let tasksTableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .clear
-        tableView.register(TaskCell.self)
+        tableView.register(TodoCell.self)
         tableView.isScrollEnabled = true
         tableView.allowsSelection = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -46,14 +46,25 @@ final class TaskListViewController: UIViewController {
         return stackView
     }()
     
-    private lazy var footerView = FooterView(text: "начало") { [weak self] in
-        self?.addTask()
+    private lazy var footerView = FooterView { [weak self] in
+        self?.add()
     }
     
     // MARK: - Override
+    init(presenter: TodosPresenterProtocol) {
+        self.presenter = presenter
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
+        presenter.viewDidLoad()
     }
     
     // MARK: - Setup view properties
@@ -71,55 +82,55 @@ final class TaskListViewController: UIViewController {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-//            footerView.heightAnchor.constraint(equalToConstant: 68),
             footerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             footerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             footerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.verticalPadding),
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.horizontalPadding),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.horizontalPadding),
-            stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Constants.verticalPadding)
+            stackView.bottomAnchor.constraint(equalTo: footerView.topAnchor)
         ])
     }
 }
 
 // MARK: - TaskListViewProtocol
-extension TaskListViewController: TaskListViewProtocol {
-    func showTaskList() {
+extension TodosViewController: TodosViewProtocol {
+    func update() {
+        footerView.setText(presenter.countText)
         tasksTableView.reloadData()
     }
     
-    func addTask() {
+    func add() {
         tasksTableView.reloadData()
         let random = [1,2,3,4,5,9,10].randomElement()?.description ?? "---"
         footerView.setText(random + " задач")
     }
     
-    func editTask(_ task: TaskEntity) {
+    func edit(_ task: TodoEntity) {
         tasksTableView.reloadData()
     }
     
-    func deleteTask(_ task: TaskEntity) {
+    func delete(_ task: TodoEntity) {
         tasksTableView.reloadData()
     }
 }
 
 // MARK: - UITableViewDataSource
-extension TaskListViewController: UITableViewDataSource {
+extension TodosViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        tasks.count
+        presenter.getNumberOfRows()
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: TaskCell = tableView.dequeueReusableCell()
-        let task = tasks[indexPath.row]
-        cell.update(with: task)
+        let cell: TodoCell = tableView.dequeueReusableCell()
+        let todo = presenter.getTodoEntity(index: indexPath.row)
+        cell.update(with: todo)
         return cell
     }
 }
 
 // MARK: - Extension: Constants
-private extension TaskListViewController {
+private extension TodosViewController {
     enum Constants {
         static let spacing: CGFloat = 6
         static let verticalPadding: CGFloat = 16
