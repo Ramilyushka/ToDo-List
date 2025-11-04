@@ -11,6 +11,7 @@ public enum Font {
     case header
     case button
     case caption
+    case footer
     
     var font: UIFont {
         switch self {
@@ -20,6 +21,8 @@ public enum Font {
             UIFont.systemFont(ofSize: 16, weight: .medium)
         case .caption:
             UIFont.systemFont(ofSize: 12, weight: .regular)
+        case .footer:
+            UIFont.systemFont(ofSize: 11, weight: .regular)
         }
     }
 }

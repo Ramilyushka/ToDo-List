@@ -13,7 +13,7 @@ protocol TaskListViewProtocol: AnyObject {
     func deleteTask(_ task: TaskEntity)
 }
 
-class TaskListViewController: UIViewController {
+final class TaskListViewController: UIViewController {
     // MARK: - Properties
     private let tasks: [TaskEntity] = MockTaskList.tasks
     
@@ -23,7 +23,7 @@ class TaskListViewController: UIViewController {
         let searchBar = UISearchBar()
         searchBar.placeholder = "Поиск"
         searchBar.barTintColor = .clear
-        searchBar.searchTextField.backgroundColor = Colors.gray.color
+        searchBar.searchTextField.backgroundColor = Color.gray.color
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         return searchBar
     }()
@@ -32,6 +32,7 @@ class TaskListViewController: UIViewController {
         tableView.backgroundColor = .clear
         tableView.register(TaskCell.self)
         tableView.isScrollEnabled = true
+        tableView.allowsSelection = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
@@ -45,6 +46,10 @@ class TaskListViewController: UIViewController {
         return stackView
     }()
     
+    private lazy var footerView = FooterView(text: "начало") { [weak self] in
+        self?.addTask()
+    }
+    
     // MARK: - Override
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,18 +58,23 @@ class TaskListViewController: UIViewController {
     
     // MARK: - Setup view properties
     private func setupViews() {
-        view.backgroundColor = Colors.black.color
+        view.backgroundColor = Color.black.color
         headerLabel.text = "Задачи"
         tasksTableView.dataSource = self
         tasksTableView.reloadData()
         
         [headerLabel, searchBar, tasksTableView].forEach(stackView.addArrangedSubview)
         view.addSubview(stackView)
+        view.addSubview(footerView)
         setupConstraints()
     }
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
+//            footerView.heightAnchor.constraint(equalToConstant: 68),
+            footerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            footerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            footerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.verticalPadding),
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.horizontalPadding),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.horizontalPadding),
@@ -81,6 +91,8 @@ extension TaskListViewController: TaskListViewProtocol {
     
     func addTask() {
         tasksTableView.reloadData()
+        let random = [1,2,3,4,5,9,10].randomElement()?.description ?? "---"
+        footerView.setText(random + " задач")
     }
     
     func editTask(_ task: TaskEntity) {

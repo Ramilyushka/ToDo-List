@@ -10,7 +10,7 @@ import UIKit
 extension UILabel {
     public convenience init(
         font: Font? = .caption,
-        textColor: UIColor? = Colors.white.color,
+        textColor: UIColor? = Color.white.color,
         opacity: CGFloat = 1,
         numberOfLines: Int = .zero,
         textAlignment: NSTextAlignment = .left

@@ -16,6 +16,16 @@ struct MockTaskList {
         ),
         .init(title: "Уборка в квартире", description: "Провести генеральную уборку в квартире", date: Date()),
         .init(title: "Task 1", description: "Description 1", date: Date()),
+        .init(title: "Task 1", description: "Description 1", date: Date()),
+        .init(title: "Task 1", description: "Description 1", date: Date()),
+        .init(title: "Task 1", description: "Description 1", date: Date()),
+        .init(title: "Task 1", description: "Description 1", date: Date()),
+        .init(title: "Task 1", description: "Description 1", date: Date()),
+        .init(title: "Task 1", description: "Description 1", date: Date()),
+        .init(title: "Task 1", description: "Description 1", date: Date()),
+        .init(title: "Task 1", description: "Description 1", date: Date()),
+        .init(title: "Task 1", description: "Description 1", date: Date()),
+        .init(title: "Task 1", description: "Description 1", date: Date()),
         .init(title: "Task 2", description: "Description 2", date: Date())
     ]
 }
