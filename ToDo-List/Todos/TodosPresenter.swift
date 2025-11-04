@@ -14,6 +14,9 @@ protocol TodosPresenterProtocol: AnyObject {
 }
 
 final class TodosPresenter: TodosPresenterProtocol {
+    @UserDefaultsStorage(.isTodosLoadedFirstTime)
+    private var isTodosLoadedFirstTime: Bool?
+    
     // MARK: - Properties
     private var todos: [TodoApi] = []
     private let network: TodosNetworkProtocol
@@ -30,6 +33,7 @@ final class TodosPresenter: TodosPresenterProtocol {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let todos):
+                    self?.isTodosLoadedFirstTime = true
                     self?.todos = todos.todos
                     self?.view?.update()
                 case .failure(let error):
@@ -46,7 +50,11 @@ final class TodosPresenter: TodosPresenterProtocol {
     }
     
     func viewDidLoad() {
-        fetchTodos()
+        if let loaded = isTodosLoadedFirstTime, loaded {
+            return
+        } else {
+            fetchTodos()
+        }
     }
     func getNumberOfRows() -> Int {
         return todos.count
