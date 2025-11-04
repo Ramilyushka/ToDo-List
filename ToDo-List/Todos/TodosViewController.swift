@@ -9,8 +9,8 @@ import UIKit
 protocol TodosViewProtocol: AnyObject {
     func update()
     func add()
-    func edit(_ task: TodoEntity)
-    func delete(_ task: TodoEntity)
+    func edit(_ task: TodoUI)
+    func delete(_ task: TodoUI)
 }
 
 final class TodosViewController: UIViewController {
@@ -106,11 +106,11 @@ extension TodosViewController: TodosViewProtocol {
         footerView.setText(random + " задач")
     }
     
-    func edit(_ task: TodoEntity) {
+    func edit(_ task: TodoUI) {
         tasksTableView.reloadData()
     }
     
-    func delete(_ task: TodoEntity) {
+    func delete(_ task: TodoUI) {
         tasksTableView.reloadData()
     }
 }

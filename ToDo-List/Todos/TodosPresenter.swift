@@ -10,7 +10,7 @@ protocol TodosPresenterProtocol: AnyObject {
     var countText: String { get }
     func viewDidLoad()
     func getNumberOfRows() -> Int
-    func getTodoEntity(index: Int) -> TodoEntity
+    func getTodoEntity(index: Int) -> TodoUI
 }
 
 final class TodosPresenter: TodosPresenterProtocol {
@@ -18,8 +18,9 @@ final class TodosPresenter: TodosPresenterProtocol {
     private var isTodosLoadedFirstTime: Bool?
     
     // MARK: - Properties
-    private var todos: [TodoApi] = []
+    private var todos: [TodoUI] = []
     private let network: TodosNetworkProtocol
+    private let coreData = TodosCoreData()
     weak var view: TodosViewProtocol?
     
     // MARK: - Init
@@ -28,20 +29,29 @@ final class TodosPresenter: TodosPresenterProtocol {
     }
     
     // MARK: - Private methods
-    private func fetchTodos() {
+    private func fetchFromApi() {
         network.getTodos { [weak self] result in
+            guard let self else { return }
             DispatchQueue.main.async {
                 switch result {
-                case .success(let todos):
-                    self?.isTodosLoadedFirstTime = true
-                    self?.todos = todos.todos
-                    self?.view?.update()
+                case .success(let data):
+                    self.isTodosLoadedFirstTime = true
+                    self.todos = data.todos.compactMap {
+                        TodoUI($0)
+                    }
+                    self.view?.update()
+                    self.coreData.saveLoaded(self.todos)
                 case .failure(let error):
                     // TODO: - alert
                     print("FAILURE: \(error)")
                 }
             }
         }
+    }
+    
+    private func fetchFromCoreData() {
+        todos = coreData.fetch()
+        view?.update()
     }
     
     // MARK: - TodosPresenterProtocol
@@ -51,23 +61,18 @@ final class TodosPresenter: TodosPresenterProtocol {
     
     func viewDidLoad() {
         if let loaded = isTodosLoadedFirstTime, loaded {
-            return
+            fetchFromCoreData()
+            print("fetchFromCoreData")
         } else {
-            fetchTodos()
+            fetchFromApi()
+            print("fetchFromApi")
         }
     }
     func getNumberOfRows() -> Int {
         return todos.count
     }
     
-    func getTodoEntity(index: Int) -> TodoEntity {
-        let todoApi = todos[index]
-        let entity = TodoEntity(
-            title: "Задача №" + todoApi.id.description,
-            description: todoApi.todo,
-            date: Date(),
-            completed: todoApi.completed
-        )
-        return entity
+    func getTodoEntity(index: Int) -> TodoUI {
+        return todos[index]
     }
 }

@@ -23,7 +23,7 @@ final class TodoCell: UITableViewCell, ReuseIdentifying {
     }()
     
     private let titleLabel = UILabel(font: .button)
-    private let descriptionLabel = UILabel(font: .caption)
+    private let todoLabel = UILabel(font: .caption)
     private let dateLabel = UILabel(font: .caption, opacity: 0.5)
     
     // MARK: - Init methods
@@ -41,7 +41,7 @@ final class TodoCell: UITableViewCell, ReuseIdentifying {
     private func setupViews() {
         backgroundColor = .clear
         contentView.layer.cornerRadius = Constants.cornerRadius
-        [titleLabel, descriptionLabel, dateLabel].forEach {
+        [titleLabel, todoLabel, dateLabel].forEach {
             innerContentStack.addArrangedSubview($0)
         }
         contentView.addSubview(checkBox)
@@ -63,9 +63,9 @@ final class TodoCell: UITableViewCell, ReuseIdentifying {
     }
     
     // MARK: - Public methods
-    public func update(with todo: TodoEntity) {
+    public func update(with todo: TodoUI) {
         titleLabel.text = todo.title
-        descriptionLabel.text = todo.description
+        todoLabel.text = todo.todo
         dateLabel.text = todo.date.shortFormat
         checkBox.isSelected = todo.completed
     }
