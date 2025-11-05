@@ -21,4 +21,17 @@ extension UILabel {
         self.numberOfLines = numberOfLines
         self.textAlignment = textAlignment
     }
+    
+    func setStrikethrough(_ active: Bool) {
+         guard let text = text else { return }
+         if active {
+             attributedText = NSAttributedString(
+                 string: text,
+                 attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue]
+             )
+         } else {
+             attributedText = nil
+             self.text = text
+         }
+     }
 }

@@ -6,7 +6,7 @@
 //
 import UIKit
 
-final class FooterView: UIView {
+final class FooterView: BaseView {
     //MARK: - Properties
     private let tapHandler: (() -> Void)?
     private var text: String?
@@ -34,18 +34,10 @@ final class FooterView: UIView {
     init(text: String? = nil, tapHandler: (() -> Void)? = nil) {
         self.text = text
         self.tapHandler = tapHandler
-        super.init(frame: .zero)
-        setupViews()
+        super.init()
     }
     
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    // MARK: - Private methods
-    private func setupViews() {
-        translatesAutoresizingMaskIntoConstraints = false
+    override func setupSubViews() {
         backgroundColor = Color.gray.color
         addSubview(label)
         
@@ -71,6 +63,7 @@ final class FooterView: UIView {
         }
     }
     
+    // MARK: - Private methods
     @objc private func touchUpInside() {
         tapHandler?()
     }

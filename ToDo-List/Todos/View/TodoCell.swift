@@ -12,24 +12,12 @@ final class TodoCell: UITableViewCell, ReuseIdentifying {
     static let identifier: String = "TaskCell"
     
     // MARK: - UI properties
-    private let checkBox = CheckboxButton()
-    
-    private let innerContentStack: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = Constants.spacing
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
-    }()
-    
-    private let titleLabel = UILabel(font: .button)
-    private let todoLabel = UILabel(font: .caption)
-    private let dateLabel = UILabel(font: .caption, opacity: 0.5)
+    private let todoView = TodoView(state: .empty)
     
     // MARK: - Init methods
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setupViews()
+        setupSubViews()
     }
     
     @available(*, unavailable)
@@ -37,49 +25,31 @@ final class TodoCell: UITableViewCell, ReuseIdentifying {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        todoView.prepareForReuse()
+    }
+    
     // MARK: - Private methods
-    private func setupViews() {
+    private func setupSubViews() {
         backgroundColor = .clear
-        contentView.layer.cornerRadius = Constants.cornerRadius
-        [titleLabel, todoLabel, dateLabel].forEach {
-            innerContentStack.addArrangedSubview($0)
-        }
-        contentView.addSubview(checkBox)
-        contentView.addSubview(innerContentStack)
+        contentView.addSubview(todoView)
         setupConstraints()
     }
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            checkBox.heightAnchor.constraint(equalToConstant: Constants.checkboxHeight),
-            checkBox.widthAnchor.constraint(equalToConstant: Constants.checkboxWidth),
-            checkBox.topAnchor.constraint(equalTo: contentView.topAnchor),
-            checkBox.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.horizontalPadding),
-            innerContentStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.verticalPadding),
-            innerContentStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -Constants.verticalPadding),
-            innerContentStack.leadingAnchor.constraint(equalTo: checkBox.trailingAnchor, constant: Constants.contentSpacing),
-            innerContentStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.horizontalPadding)
+            todoView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            todoView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            todoView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            todoView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
         ])
     }
     
     // MARK: - Public methods
-    public func update(with todo: TodoUI) {
-        titleLabel.text = todo.title
-        todoLabel.text = todo.todo
-        dateLabel.text = todo.date.shortFormat
-        checkBox.isSelected = todo.completed
-    }
-}
-
-// MARK: - Extension: Constants
-private extension TodoCell {
-    enum Constants {
-        static let cornerRadius: CGFloat = 8
-        static let spacing: CGFloat = 6
-        static let contentSpacing: CGFloat = 8
-        static let verticalPadding: CGFloat = 12
-        static let horizontalPadding: CGFloat = 20
-        static let checkboxHeight: CGFloat = 48
-        static let checkboxWidth: CGFloat = 24
+    public func update(with todo: TodoViewModel) {
+        todoView.prepare(
+            with: .content(todo)
+        )
     }
 }

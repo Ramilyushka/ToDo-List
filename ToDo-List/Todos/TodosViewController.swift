@@ -9,8 +9,8 @@ import UIKit
 protocol TodosViewProtocol: AnyObject {
     func update()
     func add()
-    func edit(_ task: TodoUI)
-    func delete(_ task: TodoUI)
+    func edit(_ task: TodoViewModel)
+    func delete(_ task: TodoViewModel)
 }
 
 final class TodosViewController: UIViewController {
@@ -24,7 +24,6 @@ final class TodosViewController: UIViewController {
         searchBar.placeholder = "Поиск"
         searchBar.barTintColor = .clear
         searchBar.searchTextField.backgroundColor = Color.gray.color
-        searchBar.translatesAutoresizingMaskIntoConstraints = false
         return searchBar
     }()
     private let tasksTableView: UITableView = {
@@ -33,7 +32,6 @@ final class TodosViewController: UIViewController {
         tableView.register(TodoCell.self)
         tableView.isScrollEnabled = true
         tableView.allowsSelection = false
-        tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
     
@@ -41,7 +39,7 @@ final class TodosViewController: UIViewController {
         let stackView = UIStackView()
         stackView.backgroundColor = .clear
         stackView.axis = .vertical
-        stackView.spacing = 16
+        stackView.spacing = Constants.stackSpacing
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
@@ -106,11 +104,11 @@ extension TodosViewController: TodosViewProtocol {
         footerView.setText(random + " задач")
     }
     
-    func edit(_ task: TodoUI) {
+    func edit(_ task: TodoViewModel) {
         tasksTableView.reloadData()
     }
     
-    func delete(_ task: TodoUI) {
+    func delete(_ task: TodoViewModel) {
         tasksTableView.reloadData()
     }
 }
@@ -132,6 +130,7 @@ extension TodosViewController: UITableViewDataSource {
 // MARK: - Extension: Constants
 private extension TodosViewController {
     enum Constants {
+        static let stackSpacing: CGFloat = 16
         static let spacing: CGFloat = 6
         static let verticalPadding: CGFloat = 16
         static let horizontalPadding: CGFloat = 8

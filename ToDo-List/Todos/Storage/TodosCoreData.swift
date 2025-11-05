@@ -36,14 +36,42 @@ final class TodosCoreData {
 
 
 extension TodosCoreData {
-    func saveLoaded(_ todos: [TodoUI]) {
+    private func fetch(with id: UUID?) throws -> TodoEntity? {
+        guard let id = id else {
+            return nil
+        }
+        
+        let request: NSFetchRequest<TodoEntity> = TodoEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+
+        do {
+            let result = try context.fetch(request)
+            return result.first
+        } catch {
+            print("Ошибка при проверке существования todo: \(error)")
+            return nil
+        }
+    }
+    
+    func fetch() -> [TodoEntity] {
+        let request: NSFetchRequest<TodoEntity> = TodoEntity.fetchRequest()
+        do {
+            return try context.fetch(request)
+        } catch {
+            print("Ошибка при получении todos: \(error)")
+            return []
+        }
+    }
+    
+    func saveLoaded(_ todos: [TodoViewModel]) {
         for todo in todos {
             save(todo)
         }
     }
     
-    func save(_ todo: TodoUI) {
+    func save(_ todo: TodoViewModel) {
         let entity = TodoEntity(context: context)
+        entity.id = todo.id
         entity.title = todo.title
         entity.todo = todo.todo
         entity.date = todo.date
@@ -52,18 +80,15 @@ extension TodosCoreData {
         saveContext()
         print("Todo сохранeн: \(todo.title)")
     }
-
-    func fetch() -> [TodoUI] {
-        let request: NSFetchRequest<TodoEntity> = TodoEntity.fetchRequest()
+    
+    func complete(_ id: UUID?, value: Bool) {
         do {
-            let objects = try context.fetch(request)
-            let todos: [TodoUI] = objects.compactMap {
-                .init($0)
-            }
-            return todos
+            let entity = try fetch(with: id)
+            entity?.completed = value
+            saveContext()
+            print("Todo completed сохранeн: \(id)")
         } catch {
             print("Ошибка при получении todos: \(error)")
-            return []
         }
     }
 }

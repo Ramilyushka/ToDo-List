@@ -10,7 +10,7 @@ protocol TodosPresenterProtocol: AnyObject {
     var countText: String { get }
     func viewDidLoad()
     func getNumberOfRows() -> Int
-    func getTodoEntity(index: Int) -> TodoUI
+    func getTodoEntity(index: Int) -> TodoViewModel
 }
 
 final class TodosPresenter: TodosPresenterProtocol {
@@ -18,7 +18,7 @@ final class TodosPresenter: TodosPresenterProtocol {
     private var isTodosLoadedFirstTime: Bool?
     
     // MARK: - Properties
-    private var todos: [TodoUI] = []
+    private var todos: [TodoViewModel] = []
     private let network: TodosNetworkProtocol
     private let coreData = TodosCoreData()
     weak var view: TodosViewProtocol?
@@ -36,9 +36,7 @@ final class TodosPresenter: TodosPresenterProtocol {
                 switch result {
                 case .success(let data):
                     self.isTodosLoadedFirstTime = true
-                    self.todos = data.todos.compactMap {
-                        TodoUI($0)
-                    }
+                    self.convertToViewModel(data.todos)
                     self.view?.update()
                     self.coreData.saveLoaded(self.todos)
                 case .failure(let error):
@@ -50,8 +48,32 @@ final class TodosPresenter: TodosPresenterProtocol {
     }
     
     private func fetchFromCoreData() {
-        todos = coreData.fetch()
+        let entitys = coreData.fetch()
+        convertToViewModel(entitys)
         view?.update()
+    }
+    
+    private func complete(at index: Int, value: Bool) {
+        todos[index].completed = value
+        coreData.complete(todos[index].id, value: value)
+    }
+    
+    private func convertToViewModel(_ data: [TodoApi]) {
+        todos = data.enumerated().compactMap { index, data in
+            let completed = !data.completed
+            return TodoViewModel(data) { [weak self] in
+                self?.complete(at: index, value: completed)
+            }
+        }
+    }
+    
+    private func convertToViewModel(_ data: [TodoEntity]) {
+        todos = data.enumerated().compactMap { index, entity in
+            let completed = !entity.completed
+            return TodoViewModel(entity) { [weak self] in
+                self?.complete(at: index, value: completed)
+            }
+        }
     }
     
     // MARK: - TodosPresenterProtocol
@@ -72,7 +94,7 @@ final class TodosPresenter: TodosPresenterProtocol {
         return todos.count
     }
     
-    func getTodoEntity(index: Int) -> TodoUI {
+    func getTodoEntity(index: Int) -> TodoViewModel {
         return todos[index]
     }
 }

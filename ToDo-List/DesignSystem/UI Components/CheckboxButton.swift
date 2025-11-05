@@ -32,15 +32,10 @@ final class CheckboxButton: UIButton {
     // MARK: - Private methods
     private func setup() {
         translatesAutoresizingMaskIntoConstraints = false
-        addTarget(self, action: #selector(toggle), for: .touchUpInside)
         updateImage()
     }
     
     private func updateImage() {
         setImage(isSelected ? iconSelected : icon, for: .normal)
-    }
-    
-    @objc private func toggle() {
-        isSelected.toggle()
     }
 }
