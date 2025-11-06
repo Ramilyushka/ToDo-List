@@ -10,10 +10,6 @@ extension TodoView {
     public enum State {
         case loading
         case content(TodoViewModel)
-        
-        public static let empty = State.content(
-            .init(id: UUID(), title: "empty", todo: "empty", date: Date.distantPast, completed: false)
-        )
     }
 }
 
@@ -23,7 +19,7 @@ final class TodoView: BaseView {
     private var action: (()-> Void)? = nil
     
     // MARK: - UI Properties
-    private lazy var checkBox = CheckboxButton()
+    private let checkBox = CheckboxButton()
     private let titleLabel = UILabel(font: .button)
     private let todoLabel = UILabel(font: .caption)
     private let dateLabel = UILabel(font: .caption, opacity: Constants.opacity)
@@ -46,6 +42,8 @@ final class TodoView: BaseView {
     override func setupSubViews() {
         backgroundColor = .clear
         layer.cornerRadius = Constants.cornerRadius
+        
+        titleLabel.attributedText = nil
         
         addSubview(checkBox)
         addSubview(innerContentStack)
@@ -108,7 +106,7 @@ final class TodoView: BaseView {
     // MARK: - Public methods
     public func prepareForReuse() {
         titleLabel.attributedText = nil
-        prepare(with: .empty)
+        prepare(with: .content(.empty))
     }
     
     public func prepare(with state: State, action: (()-> Void)? = nil) {

@@ -12,7 +12,7 @@ final class TodoCell: UITableViewCell, ReuseIdentifying {
     static let identifier: String = "TaskCell"
     
     // MARK: - UI properties
-    private let todoView = TodoView(state: .empty)
+    private let todoView = TodoView(state: .content(.empty))
     
     // MARK: - Init methods
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

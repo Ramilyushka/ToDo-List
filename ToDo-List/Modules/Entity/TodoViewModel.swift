@@ -15,6 +15,14 @@ struct TodoViewModel {
     var completed: Bool
     var action: (() -> Void)? = nil
     
+    public static let empty = TodoViewModel(
+        id: UUID(),
+        title: "empty",
+        todo: "empty",
+        date: Date.distantPast,
+        completed: false
+    )
+    
     init(id: UUID, title: String, todo: String, date: Date, completed: Bool, action: (() -> Void)? = nil) {
         self.id = id
         self.title = title

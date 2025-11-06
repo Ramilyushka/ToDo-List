@@ -6,7 +6,7 @@
 //
 import UIKit
 
-final class FooterView: BaseView {
+final class TodoFooterView: BaseView {
     //MARK: - Properties
     private let tapHandler: (() -> Void)?
     private var text: String?
@@ -76,7 +76,7 @@ final class FooterView: BaseView {
 }
 
 //MARK: - Constants
-private extension FooterView {
+private extension TodoFooterView {
     enum Constants {
         static let height: CGFloat = 68
         static let width: CGFloat = 44

@@ -8,7 +8,6 @@ import UIKit
 
 protocol TodosViewProtocol: AnyObject {
     func update()
-    func add()
 }
 
 final class TodosViewController: UIViewController {
@@ -29,7 +28,6 @@ final class TodosViewController: UIViewController {
         tableView.backgroundColor = .clear
         tableView.register(TodoCell.self)
         tableView.isScrollEnabled = true
-        tableView.allowsSelection = false
         return tableView
     }()
     
@@ -42,8 +40,8 @@ final class TodosViewController: UIViewController {
         return stackView
     }()
     
-    private lazy var footerView = FooterView { [weak self] in
-        self?.add()
+    private lazy var footerView = TodoFooterView { [weak self] in
+        self?.presenter.add()
     }
     
     // MARK: - Override
@@ -96,12 +94,6 @@ extension TodosViewController: TodosViewProtocol {
         footerView.setText(presenter.countText)
         todosTableView.reloadData()
     }
-    
-    func add() {
-        todosTableView.reloadData()
-        let random = [1,2,3,4,5,9,10].randomElement()?.description ?? "---"
-        footerView.setText(random + " задач")
-    }
 }
 
 // MARK: - UITableViewDataSource
@@ -117,11 +109,15 @@ extension TodosViewController: UITableViewDataSource, UITableViewDelegate {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+         presenter.edit(index: indexPath.row)
+     }
+    
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint)
     -> UIContextMenuConfiguration? {
         let uiMenu = createUIMenu(indexPath: indexPath)
         let model = presenter.getTodoEntity(index: indexPath.row)
-        let view = TodoView.prepareMenu(model: model)
+        let view = TodoView.prepareMenu(model: model) //TODO: перенести в презентер ???
         return UIContextMenuConfiguration(
             identifier: nil,
             previewProvider: { return view },
@@ -131,7 +127,7 @@ extension TodosViewController: UITableViewDataSource, UITableViewDelegate {
     
     private func createUIMenu(indexPath: IndexPath) -> UIMenu {
         let edit = UIAction(.edit) { [weak self] _ in
-            self?.add() //TODO: 
+            self?.presenter.edit(index: indexPath.row)
         }
 
         let share = UIAction(.share) { _ in }

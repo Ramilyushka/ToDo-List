@@ -7,9 +7,23 @@
 import CoreData
 import UIKit
 
+protocol TodosCoreDataProtocol {
+    //TODO: через throw
+    func fetch() -> [TodoEntity]
+    func saveLoaded(_ todos: [TodoViewModel])
+    func save(_ todo: TodoViewModel)
+    func complete(_ id: UUID, value: Bool)
+    func delete(_ id: UUID)
+}
+
 final class TodosCoreData {
+    // MARK: - Properties
     private let container: NSPersistentContainer
+    private var context: NSManagedObjectContext {
+        container.viewContext
+    }
     
+    // MARK: - Init
     init(modelName: String = "Todos") {
         container = NSPersistentContainer(name: modelName)
         container.loadPersistentStores { _, error in
@@ -18,11 +32,8 @@ final class TodosCoreData {
             }
         }
     }
-    
-    private var context: NSManagedObjectContext {
-        container.viewContext
-    }
 
+    // MARK: - Private methods
     private func saveContext() {
         if context.hasChanges {
             do {
@@ -32,10 +43,7 @@ final class TodosCoreData {
             }
         }
     }
-}
-
-
-extension TodosCoreData {
+    
     private func fetch(with id: UUID) throws -> TodoEntity? {
         let request: NSFetchRequest<TodoEntity> = TodoEntity.fetchRequest()
         request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
@@ -49,6 +57,10 @@ extension TodosCoreData {
         }
     }
     
+}
+
+// MARK: - TodosCoreDataProtocol
+extension TodosCoreData: TodosCoreDataProtocol {
     func fetch() -> [TodoEntity] {
         let request: NSFetchRequest<TodoEntity> = TodoEntity.fetchRequest()
         do {
