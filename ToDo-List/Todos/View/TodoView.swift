@@ -24,16 +24,17 @@ final class TodoView: BaseView {
     
     // MARK: - UI Properties
     private lazy var checkBox = CheckboxButton()
-    private let innerContentStack: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = Constants.spacing
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
-    }()
     private let titleLabel = UILabel(font: .button)
     private let todoLabel = UILabel(font: .caption)
     private let dateLabel = UILabel(font: .caption, opacity: Constants.opacity)
+    let innerContentStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = Constants.spacing
+        stack.layer.cornerRadius = Constants.cornerRadius
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
     
     // MARK: - Init
     init(state: State, action: (()-> Void)? = nil) {
@@ -67,22 +68,26 @@ final class TodoView: BaseView {
     }
     
     // MARK: - Private methods
+    private func updateContent(model: TodoViewModel) {
+        titleLabel.text = model.title
+        todoLabel.text = model.todo
+        dateLabel.text = model.date.shortFormat
+    }
+    
     private func updateUI() {
         switch state {
         case .loading:
             break
         case .content(let todoViewModel):
-            titleLabel.text = todoViewModel.title
-            todoLabel.text = todoViewModel.todo
-            dateLabel.text = todoViewModel.date.shortFormat
+            updateContent(model: todoViewModel)
             action = todoViewModel.action
             checkBox.isSelected = todoViewModel.completed
             updateCheckbox(with: todoViewModel.completed)
-            checkBox.addTarget(self, action: #selector(checkBoxTapped), for: .touchUpInside)
         }
     }
     
     private func updateCheckbox(with completed: Bool) {
+        checkBox.addTarget(self, action: #selector(checkBoxTapped), for: .touchUpInside)
         if completed {
             titleLabel.setStrikethrough(true)
             titleLabel.textColor = Color.white.color.withAlphaComponent(Constants.opacity)
@@ -111,6 +116,22 @@ final class TodoView: BaseView {
         self.action = action
         updateUI()
     }
+    
+    public static func prepareMenu(model: TodoViewModel) -> UIViewController {
+        let view = TodoView(state: .content(model))
+        let stack = view.innerContentStack
+        let menuView = UIViewController()
+        menuView.view.backgroundColor = Color.gray.color
+        menuView.view.addSubview(stack)
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: menuView.view.topAnchor, constant: Constants.verticalPadding),
+            stack.leadingAnchor.constraint(equalTo: menuView.view.leadingAnchor, constant: Constants.horizontalPadding),
+            stack.trailingAnchor.constraint(equalTo: menuView.view.trailingAnchor, constant: -Constants.horizontalPadding),
+            stack.bottomAnchor.constraint(lessThanOrEqualTo: menuView.view.bottomAnchor, constant: -Constants.verticalPadding)
+        ])
+        menuView.preferredContentSize = Constants.menuSize
+        return menuView
+    }
 }
 
 // MARK: - Constants
@@ -124,5 +145,6 @@ private extension TodoView {
         static let verticalPadding: CGFloat = 12
         static let horizontalPadding: CGFloat = 20
         static let contentSpacing: CGFloat = 8
+        static let menuSize: CGSize = CGSize(width: 320, height: 106)
     }
 }

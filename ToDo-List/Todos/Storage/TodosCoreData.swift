@@ -36,11 +36,7 @@ final class TodosCoreData {
 
 
 extension TodosCoreData {
-    private func fetch(with id: UUID?) throws -> TodoEntity? {
-        guard let id = id else {
-            return nil
-        }
-        
+    private func fetch(with id: UUID) throws -> TodoEntity? {
         let request: NSFetchRequest<TodoEntity> = TodoEntity.fetchRequest()
         request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
 
@@ -81,12 +77,26 @@ extension TodosCoreData {
         print("Todo сохранeн: \(todo.title)")
     }
     
-    func complete(_ id: UUID?, value: Bool) {
+    func complete(_ id: UUID, value: Bool) {
         do {
             let entity = try fetch(with: id)
             entity?.completed = value
             saveContext()
             print("Todo completed сохранeн: \(id)")
+        } catch {
+            print("Ошибка при получении todos: \(error)")
+        }
+    }
+    
+    func delete(_ id: UUID) {
+        do {
+            guard let entity = try fetch(with: id) else {
+                print("Ошибка при проверке существования todo")
+                return
+            }
+            context.delete(entity)
+            saveContext()
+            print("Todo удалeно: \(id)")
         } catch {
             print("Ошибка при получении todos: \(error)")
         }

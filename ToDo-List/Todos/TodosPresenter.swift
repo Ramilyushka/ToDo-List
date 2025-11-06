@@ -11,6 +11,7 @@ protocol TodosPresenterProtocol: AnyObject {
     func viewDidLoad()
     func getNumberOfRows() -> Int
     func getTodoEntity(index: Int) -> TodoViewModel
+    func delete(index: Int)
 }
 
 final class TodosPresenter: TodosPresenterProtocol {
@@ -53,25 +54,28 @@ final class TodosPresenter: TodosPresenterProtocol {
         view?.update()
     }
     
-    private func complete(at index: Int, value: Bool) {
-        todos[index].completed = value
-        coreData.complete(todos[index].id, value: value)
+    private func complete(for id: UUID, value: Bool) {
+        coreData.complete(id, value: value)
+        var todo = todos.first(where: { $0.id == id })
+        todo?.completed = value
     }
     
     private func convertToViewModel(_ data: [TodoApi]) {
         todos = data.enumerated().compactMap { index, data in
             let completed = !data.completed
-            return TodoViewModel(data) { [weak self] in
-                self?.complete(at: index, value: completed)
+            let id = UUID()
+            return TodoViewModel(data, id: id) { [weak self] in
+                self?.complete(for: id, value: completed)
             }
         }
     }
     
     private func convertToViewModel(_ data: [TodoEntity]) {
         todos = data.enumerated().compactMap { index, entity in
+            guard let id = entity.id else { return nil }
             let completed = !entity.completed
-            return TodoViewModel(entity) { [weak self] in
-                self?.complete(at: index, value: completed)
+            return TodoViewModel(entity, id: id) { [weak self] in
+                self?.complete(for: id, value: completed)
             }
         }
     }
@@ -96,5 +100,11 @@ final class TodosPresenter: TodosPresenterProtocol {
     
     func getTodoEntity(index: Int) -> TodoViewModel {
         return todos[index]
+    }
+    
+    func delete(index: Int) {
+        let todo = todos[index]
+        coreData.delete(todo.id)
+        fetchFromCoreData()
     }
 }

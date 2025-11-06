@@ -8,7 +8,7 @@
 import Foundation
 
 struct TodoViewModel {
-    let id: UUID?
+    let id: UUID
     let title: String
     let todo: String
     let date: Date
@@ -24,7 +24,7 @@ struct TodoViewModel {
         self.action = action
     }
     
-    init(_ data: TodoApi, action: (() -> Void)? = nil) {
+    init(_ data: TodoApi, id: UUID, action: (() -> Void)? = nil) {
         self.id = UUID()
         self.title = "Задача №" + data.id.description
         self.todo = data.todo
@@ -33,8 +33,8 @@ struct TodoViewModel {
         self.action = action
     }
     
-    init(_ entity: TodoEntity, action: (() -> Void)? = nil) {
-        self.id = entity.id
+    init(_ entity: TodoEntity, id: UUID, action: (() -> Void)? = nil) {
+        self.id = id
         self.title = entity.title ?? "????"
         self.todo = entity.todo ?? "????"
         self.date = entity.date ?? Date.distantPast

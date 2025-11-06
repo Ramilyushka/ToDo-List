@@ -9,8 +9,6 @@ import UIKit
 protocol TodosViewProtocol: AnyObject {
     func update()
     func add()
-    func edit(_ task: TodoViewModel)
-    func delete(_ task: TodoViewModel)
 }
 
 final class TodosViewController: UIViewController {
@@ -26,7 +24,7 @@ final class TodosViewController: UIViewController {
         searchBar.searchTextField.backgroundColor = Color.gray.color
         return searchBar
     }()
-    private let tasksTableView: UITableView = {
+    private let todosTableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .clear
         tableView.register(TodoCell.self)
@@ -69,10 +67,11 @@ final class TodosViewController: UIViewController {
     private func setupViews() {
         view.backgroundColor = Color.black.color
         headerLabel.text = "Задачи"
-        tasksTableView.dataSource = self
-        tasksTableView.reloadData()
+        todosTableView.dataSource = self
+        todosTableView.delegate = self
+        todosTableView.reloadData()
         
-        [headerLabel, searchBar, tasksTableView].forEach(stackView.addArrangedSubview)
+        [headerLabel, searchBar, todosTableView].forEach(stackView.addArrangedSubview)
         view.addSubview(stackView)
         view.addSubview(footerView)
         setupConstraints()
@@ -95,26 +94,18 @@ final class TodosViewController: UIViewController {
 extension TodosViewController: TodosViewProtocol {
     func update() {
         footerView.setText(presenter.countText)
-        tasksTableView.reloadData()
+        todosTableView.reloadData()
     }
     
     func add() {
-        tasksTableView.reloadData()
+        todosTableView.reloadData()
         let random = [1,2,3,4,5,9,10].randomElement()?.description ?? "---"
         footerView.setText(random + " задач")
-    }
-    
-    func edit(_ task: TodoViewModel) {
-        tasksTableView.reloadData()
-    }
-    
-    func delete(_ task: TodoViewModel) {
-        tasksTableView.reloadData()
     }
 }
 
 // MARK: - UITableViewDataSource
-extension TodosViewController: UITableViewDataSource {
+extension TodosViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         presenter.getNumberOfRows()
     }
@@ -124,6 +115,32 @@ extension TodosViewController: UITableViewDataSource {
         let todo = presenter.getTodoEntity(index: indexPath.row)
         cell.update(with: todo)
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint)
+    -> UIContextMenuConfiguration? {
+        let uiMenu = createUIMenu(indexPath: indexPath)
+        let model = presenter.getTodoEntity(index: indexPath.row)
+        let view = TodoView.prepareMenu(model: model)
+        return UIContextMenuConfiguration(
+            identifier: nil,
+            previewProvider: { return view },
+            actionProvider: { _ in uiMenu }
+        )
+    }
+    
+    private func createUIMenu(indexPath: IndexPath) -> UIMenu {
+        let edit = UIAction(.edit) { [weak self] _ in
+            self?.add() //TODO: 
+        }
+
+        let share = UIAction(.share) { _ in }
+        
+        let delete = UIAction(.delete) { [weak self] _ in
+            self?.presenter.delete(index: indexPath.row)
+        }
+
+        return UIMenu(title: "", children: [edit, share, delete])
     }
 }
 
