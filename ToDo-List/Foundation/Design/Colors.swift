@@ -14,23 +14,6 @@ public enum Color {
     case gray
     case red
     
-//    public var color: UIColor {
-//        switch self {
-//        case .black:
-//            return .black
-//        case .white:
-//            return .white
-//        case .yellow:
-//            return .systemYellow
-//        case .stroke:
-//            return .systemGray2
-//        case .gray:
-//            return .systemGray
-//        case .red:
-//            return .systemRed
-//        }
-//    }
-    
     public var color: UIColor {
         switch self {
         case .black:

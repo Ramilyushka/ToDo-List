@@ -6,21 +6,23 @@
 //
 import UIKit
 
-protocol TodoDetailViewProtocol {
-    func update()
+protocol TodoDetailViewProtocol: AnyObject {
+    func update(with form: TodoDetailView.Form)
 }
 
 final class TodoDetailViewController: UIViewController, TodoDetailViewProtocol {
+    private let presenter: TodoDetailPresenterProtocol
+    private lazy var detailView = TodoDetailView(form: .new) { [weak self] in
+        self?.buttonTapped()
+    }
     
-    private var todoForm: TodoDetailView.Form
-    
-    private let detailView = TodoDetailView(form: .new)
-    
-    init(todoForm: TodoDetailView.Form) {
-        self.todoForm = todoForm
+    // MARK: - Override
+    init(presenter: TodoDetailPresenterProtocol) {
+        self.presenter = presenter
         super.init(nibName: nil, bundle: nil)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -28,7 +30,7 @@ final class TodoDetailViewController: UIViewController, TodoDetailViewProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupSubViews()
-        update()
+        presenter.viewDidLoad()
     }
     
     private func setupSubViews() {
@@ -42,7 +44,12 @@ final class TodoDetailViewController: UIViewController, TodoDetailViewProtocol {
         ])
     }
     
-    func update() {
-        detailView.prepare(with: todoForm)
+    private func buttonTapped() {
+        presenter.save(title: detailView.title, detail: detailView.detail)
+    }
+    
+    // MARK: - TodoDetailViewProtocol
+    func update(with form: TodoDetailView.Form) {
+        detailView.prepare(with: form)
     }
 }

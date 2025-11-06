@@ -44,6 +44,7 @@ final class TodoView: BaseView {
         layer.cornerRadius = Constants.cornerRadius
         
         titleLabel.attributedText = nil
+        checkBox.addTarget(self, action: #selector(checkBoxTapped), for: .touchUpInside)
         
         addSubview(checkBox)
         addSubview(innerContentStack)
@@ -85,7 +86,6 @@ final class TodoView: BaseView {
     }
     
     private func updateCheckbox(with completed: Bool) {
-        checkBox.addTarget(self, action: #selector(checkBoxTapped), for: .touchUpInside)
         if completed {
             titleLabel.setStrikethrough(true)
             titleLabel.textColor = Color.white.color.withAlphaComponent(Constants.opacity)

@@ -57,7 +57,19 @@ final class TodosCoreData {
         }
     }
     
+    private func new(_ todo: TodoViewModel) {
+        let entity = TodoEntity(context: context)
+        entity.id = todo.id
+        entity.title = todo.title
+        entity.todo = todo.todo
+        entity.date = todo.date
+        entity.completed = todo.completed
+
+        saveContext()
+        print("Todo сохранeн: \(todo.title)")
+    }
 }
+
 
 // MARK: - TodosCoreDataProtocol
 extension TodosCoreData: TodosCoreDataProtocol {
@@ -73,20 +85,22 @@ extension TodosCoreData: TodosCoreDataProtocol {
     
     func saveLoaded(_ todos: [TodoViewModel]) {
         for todo in todos {
-            save(todo)
+            new(todo)
         }
     }
     
     func save(_ todo: TodoViewModel) {
-        let entity = TodoEntity(context: context)
-        entity.id = todo.id
-        entity.title = todo.title
-        entity.todo = todo.todo
-        entity.date = todo.date
-        entity.completed = todo.completed
-
-        saveContext()
-        print("Todo сохранeн: \(todo.title)")
+        do {
+            guard let entity = try fetch(with: todo.id) else {
+                new(todo)
+                return
+            }
+            entity.title = todo.title
+            entity.todo = todo.todo
+            saveContext()
+        } catch {
+            print("Ошибка при получении todos: \(error)")
+        }
     }
     
     func complete(_ id: UUID, value: Bool) {

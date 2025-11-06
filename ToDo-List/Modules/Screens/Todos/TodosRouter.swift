@@ -4,18 +4,17 @@
 //
 //  Created by Ramilia on 06/11/25.
 //
-
 import UIKit
 
 protocol TodosRouterProtocol {
     func navigateToTodoDetail(with form: TodoDetailView.Form)
 }
 
-class TodosRouter: TodosRouterProtocol {
+final class TodosRouter: TodosRouterProtocol {
     weak var view: UIViewController?
     
     func navigateToTodoDetail(with form: TodoDetailView.Form) {
-        let detailView = TodoDetailViewController(todoForm: form)
+        let detailView = TodoDetailAssembly.make(with: form)
         view?.navigationController?.pushViewController(detailView, animated: true)
     }
 }

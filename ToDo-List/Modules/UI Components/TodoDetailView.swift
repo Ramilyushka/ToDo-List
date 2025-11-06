@@ -17,6 +17,10 @@ extension TodoDetailView {
 final class TodoDetailView: BaseView {
     // MARK: - Properties
     private var form: Form
+    private var action: (()-> Void)? = nil
+    
+    public var title: String?
+    public var detail: String?
     
     // MARK: - UI Properties
     private let titleField: UITextField = {
@@ -28,7 +32,7 @@ final class TodoDetailView: BaseView {
         field.textColor = Color.white.color
         return field
     }()
-    private let todoField: UITextView = {
+    private let detailField: UITextView = {
         let field = UITextView()
         field.font = Font.button.font
         field.layer.cornerRadius = Constants.radius
@@ -57,22 +61,27 @@ final class TodoDetailView: BaseView {
     }()
     
     // MARK: - Init
-    init(form: Form) {
+    init(form: Form, action: (()-> Void)? = nil) {
         self.form = form
+        self.action = action
         super.init()
     }
     
     override func setupSubViews() {
         backgroundColor = .clear
         
+        titleField.delegate = self
+        detailField.delegate = self
+        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        
         addSubview(innerContentStack)
         innerContentStack.addArrangedSubview(titleField)
         innerContentStack.addArrangedSubview(dateLabel)
-        innerContentStack.addArrangedSubview(todoField)
+        innerContentStack.addArrangedSubview(detailField)
         innerContentStack.addArrangedSubview(button)
         
         NSLayoutConstraint.activate([
-            todoField.heightAnchor.constraint(equalToConstant: Constants.todoHeight),
+            detailField.heightAnchor.constraint(equalToConstant: Constants.todoHeight),
             innerContentStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.horizontalPadding),
             innerContentStack.topAnchor.constraint(equalTo: topAnchor, constant: Constants.verticalPadding),
             innerContentStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Constants.verticalPadding),
@@ -86,21 +95,44 @@ final class TodoDetailView: BaseView {
         switch form {
         case .new:
             titleField.placeholder = "Название"
-            todoField.text = "Описание"
             dateLabel.text = Date().shortFormat
             button.setTitle("Добавить", for: .normal)
         case .edit(let model):
             titleField.text = model.title
-            todoField.text = model.todo
+            detailField.text = model.todo
             dateLabel.text = model.date.shortFormat
             button.setTitle("Сохранить", for: .normal)
         }
+    }
+    
+    private func buttonHidden() {
+        button.isHidden = true
+        if detailField.text?.isEmpty == false && titleField.text?.isEmpty == false {
+            button.isHidden = false
+        }
+    }
+    
+    @objc private func buttonTapped() {
+        title = titleField.text
+        detail = detailField.text
+        button.isHidden = true
+        action?()
     }
     
     // MARK: - Public methods
     public func prepare(with form: Form) {
         self.form = form
         updateUI()
+    }
+}
+
+extension TodoDetailView: UITextFieldDelegate, UITextViewDelegate {
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        buttonHidden()
+    }
+    
+    func textViewDidChange(_ textView: UITextView) {
+        buttonHidden()
     }
 }
 

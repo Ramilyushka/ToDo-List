@@ -28,6 +28,21 @@ final class TodosPresenter: TodosPresenterProtocol {
     init(interactor: TodosInteractorProtocol, router: TodosRouterProtocol) {
         self.interactor = interactor
         self.router = router
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(update),
+            name: .todoSaved,
+            object: nil
+        )
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc private func update() {
+        interactor.fetch()
     }
     
     // MARK: - TodosPresenterProtocol
@@ -53,12 +68,12 @@ final class TodosPresenter: TodosPresenterProtocol {
     }
     
     func add() {
-        router.navigateToTodoDetail(state: .new)
+        router.navigateToTodoDetail(with: .new)
     }
     
     func edit(index: Int) {
         let todo = todos[index]
-        router.navigateToTodoDetail(state: .edit(todo))
+        router.navigateToTodoDetail(with: .edit(todo))
     }
 }
 
