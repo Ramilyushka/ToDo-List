@@ -14,6 +14,7 @@ protocol TodosPresenterProtocol: AnyObject {
     func delete(index: Int)
     func add()
     func edit(index: Int)
+    func search(text: String?)
 }
 
 final class TodosPresenter: TodosPresenterProtocol {
@@ -74,6 +75,10 @@ final class TodosPresenter: TodosPresenterProtocol {
     func edit(index: Int) {
         let todo = todos[index]
         router.navigateToTodoDetail(with: .edit(todo))
+    }
+    
+    func search(text: String?) {
+        interactor.search(text: text)
     }
 }
 

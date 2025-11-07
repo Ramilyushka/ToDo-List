@@ -20,9 +20,9 @@ final class TodoView: BaseView {
     
     // MARK: - UI Properties
     private let checkBox = CheckboxButton()
-    private let titleLabel = UILabel(font: .button)
-    private let todoLabel = UILabel(font: .caption)
-    private let dateLabel = UILabel(font: .caption, opacity: Constants.opacity)
+    private let titleLabel = UILabel(font: .appFont(.button))
+    private let todoLabel = UILabel()
+    private let dateLabel = UILabel(textColor: .appWhite50)
     let innerContentStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
@@ -88,12 +88,12 @@ final class TodoView: BaseView {
     private func updateCheckbox(with completed: Bool) {
         if completed {
             titleLabel.setStrikethrough(true)
-            titleLabel.textColor = Color.white.color.withAlphaComponent(Constants.opacity)
-            todoLabel.textColor = Color.white.color.withAlphaComponent(Constants.opacity)
+            titleLabel.textColor = .appWhite50
+            todoLabel.textColor = .appWhite50
         } else {
             titleLabel.setStrikethrough(false)
-            titleLabel.textColor = Color.white.color
-            todoLabel.textColor = Color.white.color
+            titleLabel.textColor = .appWhite
+            todoLabel.textColor = .appWhite
         }
     }
     
@@ -119,7 +119,7 @@ final class TodoView: BaseView {
         let view = TodoView(state: .content(model))
         let stack = view.innerContentStack
         let menuView = UIViewController()
-        menuView.view.backgroundColor = Color.gray.color
+        menuView.view.backgroundColor = .appGray
         menuView.view.addSubview(stack)
         NSLayoutConstraint.activate([
             stack.topAnchor.constraint(equalTo: menuView.view.topAnchor, constant: Constants.verticalPadding),
@@ -137,7 +137,6 @@ private extension TodoView {
     enum Constants {
         static let cornerRadius: CGFloat = 12
         static let spacing: CGFloat = 6
-        static let opacity: CGFloat = 0.5
         static let checkboxHeight: CGFloat = 48
         static let checkboxWidth: CGFloat = 24
         static let verticalPadding: CGFloat = 12

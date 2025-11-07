@@ -9,6 +9,7 @@ import Foundation
 protocol TodosInteractorProtocol: AnyObject {
     func fetch()
     func delete(id: UUID)
+    func search(text: String?)
 }
 
 protocol TodosOutputProtocol: AnyObject {
@@ -25,6 +26,8 @@ final class TodosInteractor: TodosInteractorProtocol {
     private let coreData: TodosCoreDataProtocol
     weak var output: TodosOutputProtocol?
     
+    private var searchText: String?
+    
     // MARK: - Init
     init(network: TodosNetworkProtocol, coreData: TodosCoreDataProtocol) {
         self.network = network
@@ -32,6 +35,27 @@ final class TodosInteractor: TodosInteractorProtocol {
     }
     
     // MARK: - Private methods
+    private func performFetch(with text: String?) {
+        let text = text?.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if let text, !text.isEmpty {
+            if let coreFiltered = coreData.search(with: text) {
+                let filtered = prepare(from: coreFiltered)
+                output?.didFetch(todos: filtered)
+            } //TODO: в случае ошибки
+        } else {
+            fetchAll()
+        }
+    }
+    
+    private func fetchAll() {
+        if let loaded = isTodosLoadedFirstTime, loaded {
+            fetchFromCoreData()
+        } else {
+            fetchFromApi()
+        }
+    }
+    
     private func fetchFromApi() {
         network.getTodos { [weak self] result in
             guard let self else { return }
@@ -85,15 +109,16 @@ final class TodosInteractor: TodosInteractorProtocol {
     
     // MARK: - TodosInteractorProtocol
     func fetch() {
-        if let loaded = isTodosLoadedFirstTime, loaded {
-            fetchFromCoreData()
-        } else {
-            fetchFromApi()
-        }
+        performFetch(with: searchText)
     }
     
     func delete(id: UUID) {
         coreData.delete(id)
-        fetchFromCoreData() //TODO: либо удалить из масива todos элемент и перерисовать таблицу ???
+        performFetch(with: searchText)
+    }
+    
+    func search(text: String?) {
+        searchText = text
+        performFetch(with: searchText)
     }
 }

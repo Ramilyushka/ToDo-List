@@ -15,13 +15,18 @@ final class TodosViewController: UIViewController {
     private let presenter: TodosPresenterProtocol
     
     // MARK: - UI properties
-    private let headerLabel = UILabel(font: .header)
-    private let searchBar: UISearchBar = {
-        let searchBar = UISearchBar()
-        searchBar.placeholder = "Поиск"
-        searchBar.barTintColor = .clear
-        searchBar.searchTextField.backgroundColor = Color.gray.color
-        return searchBar
+    private let headerLabel = UILabel(font: .appFont(.header))
+    private let searchField: UISearchTextField = {
+        let searchField = UISearchTextField()
+        searchField.tintColor = .appWhite50
+        searchField.textColor = .appWhite
+        searchField.attributedPlaceholder = NSAttributedString(
+            string: "Search",
+            attributes: [.foregroundColor: UIColor.appWhite50]
+        )
+        searchField.returnKeyType = .done
+        searchField.translatesAutoresizingMaskIntoConstraints = false
+        return searchField
     }()
     private let todosTableView: UITableView = {
         let tableView = UITableView()
@@ -63,13 +68,15 @@ final class TodosViewController: UIViewController {
     
     // MARK: - Setup view properties
     private func setupViews() {
-        view.backgroundColor = Color.black.color
+        view.backgroundColor = .appBlack
+        searchField.text = ""
         headerLabel.text = "Задачи"
+        searchField.delegate = self
         todosTableView.dataSource = self
         todosTableView.delegate = self
         todosTableView.reloadData()
         
-        [headerLabel, searchBar, todosTableView].forEach(stackView.addArrangedSubview)
+        [headerLabel, searchField, todosTableView].forEach(stackView.addArrangedSubview)
         view.addSubview(stackView)
         view.addSubview(footerView)
         setupConstraints()
@@ -77,6 +84,7 @@ final class TodosViewController: UIViewController {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
+            searchField.heightAnchor.constraint(equalToConstant: Constants.searchHeight),
             footerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             footerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             footerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -140,6 +148,17 @@ extension TodosViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
+// MARK: - UITextFieldDelegate
+extension TodosViewController: UITextFieldDelegate {
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        presenter.search(text: textField.text)
+    }
+    
+    func textFieldShouldReturn(_textField: UITextField) -> Bool {
+        return true
+    }
+}
+
 // MARK: - Extension: Constants
 private extension TodosViewController {
     enum Constants {
@@ -147,5 +166,6 @@ private extension TodosViewController {
         static let spacing: CGFloat = 6
         static let verticalPadding: CGFloat = 16
         static let horizontalPadding: CGFloat = 8
+        static let searchHeight: CGFloat = 36
     }
 }

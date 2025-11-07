@@ -34,7 +34,7 @@ final class TodoDetailViewController: UIViewController, TodoDetailViewProtocol {
     }
     
     private func setupSubViews() {
-        view.backgroundColor = Color.black.color
+        view.backgroundColor = .appBlack
         view.addSubview(detailView)
         
         NSLayoutConstraint.activate([

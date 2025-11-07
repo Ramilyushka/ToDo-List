@@ -25,24 +25,24 @@ final class TodoDetailView: BaseView {
     // MARK: - UI Properties
     private let titleField: UITextField = {
         let field = UITextField()
-        field.font = Font.header.font
+        field.font = .appFont(.header)
         field.layer.cornerRadius = Constants.radius
         field.layer.borderWidth = 1
-        field.layer.borderColor = Color.gray.color.cgColor
-        field.textColor = Color.white.color
+        field.layer.borderColor = UIColor.appGray.cgColor
+        field.textColor = .appWhite
         return field
     }()
     private let detailField: UITextView = {
         let field = UITextView()
-        field.font = Font.button.font
+        field.font = .appFont(.button)
         field.layer.cornerRadius = Constants.radius
         field.layer.borderWidth = 1
-        field.layer.borderColor = Color.gray.color.cgColor
-        field.textColor = Color.white.color
+        field.layer.borderColor = UIColor.appGray.cgColor
+        field.textColor = .appWhite
         field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
-    private let dateLabel = UILabel(font: .caption, opacity: Constants.opacity)
+    private let dateLabel = UILabel(textColor: .appWhite50)
     let innerContentStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
@@ -52,9 +52,9 @@ final class TodoDetailView: BaseView {
     }()
     private let button: UIButton = {
         let button = UIButton(type: .system)
-        button.titleLabel?.font = Font.button.font
-        button.setTitleColor(Color.white.color, for: .normal)
-        button.backgroundColor = Color.black.color
+        button.titleLabel?.font = .appFont(.button)
+        button.setTitleColor(.appWhite, for: .normal)
+       // button.backgroundColor = Color.black.value
         button.layer.cornerRadius = Constants.radius
         button.isHidden = true
         return button
@@ -141,7 +141,6 @@ private extension TodoDetailView {
     enum Constants {
         static let radius: CGFloat = 8
         static let spacing: CGFloat = 8
-        static let opacity: CGFloat = 0.5
         static let verticalPadding: CGFloat = 12
         static let horizontalPadding: CGFloat = 20
         static let todoHeight: CGFloat = 200

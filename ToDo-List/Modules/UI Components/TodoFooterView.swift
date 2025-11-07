@@ -14,8 +14,8 @@ final class TodoFooterView: BaseView {
     //MARK: - UI Properties
     private let label: UILabel = {
         let label = UILabel()
-        label.textColor = Color.white.color
-        label.font = Font.footer.font
+        label.textColor = .appWhite
+        label.font = .appFont(.footer)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -23,7 +23,7 @@ final class TodoFooterView: BaseView {
     
     private let button: UIButton = {
         let button = UIButton()
-        button.setTitleColor(Color.yellow.color, for: .normal)
+        button.setTitleColor(.appYellow, for: .normal)
         button.backgroundColor = .clear
         button.setImage(UIImage(named: "new"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -38,7 +38,7 @@ final class TodoFooterView: BaseView {
     }
     
     override func setupSubViews() {
-        backgroundColor = Color.gray.color
+        backgroundColor = .appGray
         addSubview(label)
         
         NSLayoutConstraint.activate([

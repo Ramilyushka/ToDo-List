@@ -14,6 +14,7 @@ protocol TodosCoreDataProtocol {
     func save(_ todo: TodoViewModel)
     func complete(_ id: UUID, value: Bool)
     func delete(_ id: UUID)
+    func search(with text: String) -> [TodoEntity]?
 }
 
 final class TodosCoreData {
@@ -57,7 +58,7 @@ final class TodosCoreData {
         }
     }
     
-    private func new(_ todo: TodoViewModel) {
+    private func add(_ todo: TodoViewModel) {
         let entity = TodoEntity(context: context)
         entity.id = todo.id
         entity.title = todo.title
@@ -85,14 +86,14 @@ extension TodosCoreData: TodosCoreDataProtocol {
     
     func saveLoaded(_ todos: [TodoViewModel]) {
         for todo in todos {
-            new(todo)
+            add(todo)
         }
     }
     
     func save(_ todo: TodoViewModel) {
         do {
             guard let entity = try fetch(with: todo.id) else {
-                new(todo)
+                add(todo)
                 return
             }
             entity.title = todo.title
@@ -125,6 +126,19 @@ extension TodosCoreData: TodosCoreDataProtocol {
             print("Todo удалeно: \(id)")
         } catch {
             print("Ошибка при получении todos: \(error)")
+        }
+    }
+    
+    func search(with text: String) -> [TodoEntity]? {
+        let request: NSFetchRequest<TodoEntity> = TodoEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", text)
+
+        do {
+            let result = try context.fetch(request)
+            return result
+        } catch {
+            print("Ошибка при поиске todo: \(error)")
+            return nil
         }
     }
 }
