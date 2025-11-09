@@ -7,8 +7,10 @@
 
 import Foundation
 
+typealias Todos = MockTodoViewModel
+
 struct MockTodoViewModel {
-    static let todos: [TodoViewModel] = [
+    static let models: [TodoViewModel] = [
         .init(
             id: UUID(),
             title: "Почитать книгу",

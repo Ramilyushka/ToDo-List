@@ -89,7 +89,7 @@ extension TodosPresenter: TodosOutputProtocol {
     }
     
     func didComplete(id: UUID, value: Bool) {
-        var todo = todos.first(where: { $0.id == id })
-        todo?.completed = value
+        guard let index = todos.firstIndex(where: { $0.id == id }) else { return }
+        todos[index].completed = value
     }
 }
