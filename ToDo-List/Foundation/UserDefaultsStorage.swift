@@ -27,12 +27,22 @@ public struct UserDefaultsStorage<T> {
             setValue(newValue)
         }
     }
-
+    
     private func getValue() -> T? {
         userDefaults.object(forKey: key) as? T
     }
 
     private func setValue(_ value: T?) {
         userDefaults.setValue(value, forKey: key)
+    }
+}
+
+extension UserDefaults {
+    static func resetAll() {
+        let defaults = UserDefaults.standard
+        if let bundleID = Bundle.main.bundleIdentifier {
+            defaults.removePersistentDomain(forName: bundleID)
+        }
+        defaults.synchronize()
     }
 }

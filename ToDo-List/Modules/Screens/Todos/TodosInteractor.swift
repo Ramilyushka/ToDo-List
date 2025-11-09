@@ -19,7 +19,7 @@ protocol TodosOutputProtocol: AnyObject {
 
 final class TodosInteractor: TodosInteractorProtocol {
     @UserDefaultsStorage(.isTodosLoadedFirstTime)
-    private var isTodosLoadedFirstTime: Bool?
+    var isTodosLoadedFirstTime: Bool?
     
     // MARK: - Properties
     private let network: TodosNetworkProtocol
@@ -38,13 +38,19 @@ final class TodosInteractor: TodosInteractorProtocol {
     private func performFetch(with text: String?) {
         let text = text?.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         
-        if let text, !text.isEmpty {
-            if let coreFiltered = coreData.search(with: text) {
-                let filtered = prepare(from: coreFiltered)
-                output?.didFetch(todos: filtered)
-            } //TODO: в случае ошибки
-        } else {
-            fetchAll()
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else { return }
+            
+            if let text, !text.isEmpty {
+                if let coreFiltered = coreData.search(with: text) {
+                    let filtered = prepare(from: coreFiltered)
+                    DispatchQueue.main.async {
+                        self.output?.didFetch(todos: filtered)
+                    }
+                } //TODO: в случае ошибки
+            } else {
+                fetchAll()
+            }
         }
     }
     
@@ -59,25 +65,32 @@ final class TodosInteractor: TodosInteractorProtocol {
     private func fetchFromApi() {
         network.getTodos { [weak self] result in
             guard let self else { return }
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let data):
+            switch result {
+            case .success(let data):
+                DispatchQueue.global(qos: .userInitiated).async {
                     self.isTodosLoadedFirstTime = true
                     let todos = self.prepare(from: data.todos)
                     self.coreData.saveLoaded(todos)
-                    self.output?.didFetch(todos: todos)
-                case .failure(let error):
-                    // TODO: - alert
-                    print("FAILURE: \(error)")
+                    DispatchQueue.main.async {
+                        self.output?.didFetch(todos: todos)
+                    }
                 }
+            case .failure(let error):
+                // TODO: - alert
+                print("FAILURE: \(error)")
             }
         }
     }
     
     private func fetchFromCoreData() {
-        let entitys = coreData.fetch()
-        let todos = prepare(from: entitys)
-        output?.didFetch(todos: todos)
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else { return }
+            let entitys = coreData.fetch()
+            let todos = prepare(from: entitys)
+            DispatchQueue.main.async {
+                self.output?.didFetch(todos: todos)
+            }
+        }
     }
     
     private func prepare(from data: [TodoApi]) -> [TodoViewModel] {
@@ -103,8 +116,13 @@ final class TodosInteractor: TodosInteractorProtocol {
     }
     
     private func complete(id: UUID, value: Bool) {
-        coreData.complete(id, value: value)
-        output?.didComplete(id: id, value: value)
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else { return }
+            coreData.complete(id, value: value)
+            DispatchQueue.main.async {
+                self.output?.didComplete(id: id, value: value)
+            }
+        }
     }
     
     // MARK: - TodosInteractorProtocol
@@ -113,8 +131,11 @@ final class TodosInteractor: TodosInteractorProtocol {
     }
     
     func delete(id: UUID) {
-        coreData.delete(id)
-        performFetch(with: searchText)
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else { return }
+            coreData.delete(id)
+            performFetch(with: searchText)
+        }
     }
     
     func search(text: String?) {
