@@ -21,6 +21,7 @@ final class MockTodosCoreData: TodosCoreDataProtocol {
     var deleteCalled = false
     var completeCalled = false
     
+    var mockSavedTodo: TodoViewModel?
     var mockEntities: [ToDo_List.TodoEntity] = []
     var savedLoaded: [TodoViewModel] = []
     
@@ -36,6 +37,7 @@ final class MockTodosCoreData: TodosCoreDataProtocol {
     
     func save(_ todo: ToDo_List.TodoViewModel) {
         saveCalled = true
+        mockSavedTodo = todo
     }
     
     func saveLoaded(_ todos: [TodoViewModel]) {

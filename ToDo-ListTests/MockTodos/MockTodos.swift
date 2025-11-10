@@ -4,8 +4,8 @@
 //
 //  Created by Ramilia on 03/11/25.
 //
-
 import Foundation
+@testable import ToDo_List
 
 typealias Todos = MockTodoViewModel
 
@@ -38,4 +38,6 @@ struct MockTodoViewModel {
         .init(id: UUID(), title: "Task 1", todo: "Description 1", date: Date(), completed: false),
         .init(id: UUID(), title: "Task 2", todo: "Description 2", date: Date(), completed: true)
     ]
+    
+    static let model: TodoViewModel = .init(id: UUID(), title: "Title", todo: "Todo", date: Date(), completed: false)
 }

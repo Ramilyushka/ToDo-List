@@ -154,7 +154,8 @@ extension TodosViewController: UITextFieldDelegate {
         presenter.search(text: textField.text)
     }
     
-    func textFieldShouldReturn(_textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
         return true
     }
 }

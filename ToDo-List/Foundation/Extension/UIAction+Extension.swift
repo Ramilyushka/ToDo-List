@@ -27,11 +27,11 @@ extension UIAction {
         var value: Model {
             switch self {
             case .edit:
-                    .init(title: "Редактировать", image: UIImage(named: "edit")?.withTintColor(.appWhite))
+                    .init(title: "Редактировать", image: UIImage(named: "edit")?.withTintColor(.appWhite, renderingMode: .alwaysOriginal))
             case .share:
-                    .init(title: "Поделиться", image: UIImage(named: "export")?.withTintColor(.appWhite), attributes: .disabled)
+                    .init(title: "Поделиться", image: UIImage(named: "export")?.withTintColor(.appWhite, renderingMode: .alwaysOriginal), attributes: .disabled)
             case .delete:
-                    .init(title: "Удалить", image: UIImage(named: "trash")?.withTintColor(.appRed), attributes: .destructive)
+                    .init(title: "Удалить", image: UIImage(named: "trash")?.withTintColor(.appRed, renderingMode: .alwaysOriginal), attributes: .destructive)
             }
         }
     }

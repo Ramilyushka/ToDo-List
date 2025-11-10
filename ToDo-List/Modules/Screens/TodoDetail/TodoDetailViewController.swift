@@ -45,7 +45,7 @@ final class TodoDetailViewController: UIViewController, TodoDetailViewProtocol {
     }
     
     private func buttonTapped() {
-        presenter.save(title: detailView.title, detail: detailView.detail)
+        presenter.save(title: detailView.title, todo: detailView.detail)
     }
     
     // MARK: - TodoDetailViewProtocol

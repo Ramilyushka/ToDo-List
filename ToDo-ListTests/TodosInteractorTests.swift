@@ -5,7 +5,6 @@
 //  Created by Ramilia on 08/11/25.
 //
 import XCTest
-import CoreData
 @testable import ToDo_List
 
 final class TodosInteractorTests: XCTestCase {

@@ -10,11 +10,11 @@ enum TodoDetailAssembly {
     static func make(with form: TodoDetailView.Form) -> UIViewController {
         //Interactor
         let coreData = TodosCoreData()
-        let interactor = TodoDetailInteractor(coreData: coreData)
+        let interactor = TodoDetailInteractor(form: form, coreData: coreData)
         
         //Presenter
         let router = TodoDetailRouter()
-        let presenter = TodoDetailPresenter(form: form, interactor: interactor, router: router)
+        let presenter = TodoDetailPresenter(interactor: interactor, router: router)
         interactor.output = presenter
         
         //View
