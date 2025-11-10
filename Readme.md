@@ -27,6 +27,7 @@ https://dummyjson.com/todos
 - Поиск по названию задачи  
 
 # Скриншоты
+<img width="1887" height="2600" alt="Untitled" src="https://github.com/user-attachments/assets/2e60740e-3e38-45f1-a037-7202d1f53502" />
 
 # TODO
 
