@@ -1,0 +1,27 @@
+//
+//  NetworkRequest.swift
+//  ToDo-List
+//
+//  Created by Ramilia on 25/10/25.
+//
+import Foundation
+
+enum HttpMethod: String {
+    case get = "GET"
+    case post = "POST"
+    case put = "PUT"
+    case delete = "DELETE"
+}
+
+protocol NetworkRequest {
+    var endpoint: URL? { get }
+    var httpMethod: HttpMethod { get }
+    var dto: Encodable? { get }
+    var body: Data? { get }
+}
+
+extension NetworkRequest {
+    var httpMethod: HttpMethod { .get }
+    var dto: Encodable? { nil }
+    var body: Data? { nil }
+}
