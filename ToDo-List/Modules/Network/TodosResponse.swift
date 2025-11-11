@@ -5,11 +5,11 @@
 //  Created by Ramilia on 04/11/25.
 //
 
-struct TodosResponse: Codable {
+struct TodosResponse: Decodable {
     let todos: [TodoApi]
 }
 
-struct TodoApi: Codable {
+struct TodoApi: Decodable {
     let id: Int
     let todo: String
     let completed: Bool

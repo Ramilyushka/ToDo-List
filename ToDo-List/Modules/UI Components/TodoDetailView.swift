@@ -39,6 +39,7 @@ final class TodoDetailView: BaseView {
         field.layer.borderWidth = 1
         field.layer.borderColor = UIColor.appGray.cgColor
         field.textColor = .appWhite
+        field.backgroundColor = .clear
         field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
